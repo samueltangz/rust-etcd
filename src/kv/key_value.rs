@@ -6,18 +6,12 @@ pub struct KeyValue {
 }
 
 impl KeyValue {
-    pub fn key(&self) -> String {
-        // FIXME perf
-        std::str::from_utf8(self.key_value.get_key())
-            .unwrap()
-            .to_owned()
+    pub fn key(&self) -> &[u8] {
+        self.key_value.get_key()
     }
 
-    pub fn value(&self) -> String {
-        // FIXME perf
-        std::str::from_utf8(self.key_value.get_value())
-            .unwrap()
-            .to_owned()
+    pub fn value(&self) -> &[u8] {
+        self.key_value.get_value()
     }
 
     pub fn version(&self) -> i64 {

@@ -14,7 +14,7 @@ license = "MIT"
 all-features = true
 
 [dependencies]
-grpcio = "0.4"
+grpcio = "=0.4.4"
 futures = "0.1"
 protobuf = { version = "2", features = ["with-bytes"] }
 

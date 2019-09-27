@@ -3,7 +3,7 @@ use crate::proto::rpc;
 use crate::ResponseHeader;
 
 pub struct GetRequest {
-    key: String,
+    key: Vec<u8>,
     end_key: Option<Vec<u8>>,
     limit: i64,
     revision: i64,
@@ -13,12 +13,10 @@ pub struct GetRequest {
 }
 
 impl GetRequest {
-    pub fn key<N>(key: N) -> Self
-    where
-        N: Into<String>,
+    pub fn key(key: &[u8]) -> Self
     {
         Self {
-            key: key.into(),
+            key: key.to_vec(),
             end_key: None,
             limit: 0,
             revision: 0,
@@ -28,13 +26,11 @@ impl GetRequest {
         }
     }
 
-    pub fn prefix<N>(prefix: N) -> Self
-    where
-        N: Into<String>,
+    pub fn prefix(prefix: &[u8]) -> Self
     {
-        let key = prefix.into();
+        let key = prefix.to_vec();
         let end_key = {
-            let mut end = key.clone().into_bytes();
+            let mut end = key.clone();
 
             for i in (0..end.len()).rev() {
                 if end[i] < 0xff {
@@ -48,7 +44,7 @@ impl GetRequest {
         };
 
         Self {
-            key: key,
+            key: key.to_vec(),
             end_key: Some(end_key),
             limit: 0,
             revision: 0,
@@ -58,13 +54,11 @@ impl GetRequest {
         }
     }
 
-    pub fn range<N>(key: N, end_key: N) -> Self
-    where
-        N: Into<String>,
+    pub fn range(key: &[u8], end_key: &[u8]) -> Self
     {
         Self {
-            key: key.into(),
-            end_key: Some(end_key.into().into_bytes()),
+            key: key.to_vec(),
+            end_key: Some(end_key.to_vec()),
             limit: 0,
             revision: 0,
             serializable: false,
@@ -103,7 +97,7 @@ impl Into<rpc::RangeRequest> for GetRequest {
     fn into(self) -> rpc::RangeRequest {
         let mut req = rpc::RangeRequest::new();
 
-        req.set_key(self.key.into_bytes());
+        req.set_key(self.key);
         if let Some(range_end) = self.end_key {
             req.set_range_end(range_end);
         }

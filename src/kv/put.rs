@@ -3,8 +3,8 @@ use crate::proto::rpc;
 use crate::ResponseHeader;
 
 pub struct PutRequest {
-    key: String,
-    value: String,
+    key: Vec<u8>,
+    value: Vec<u8>,
     lease: Option<i64>,
     prev_kv: bool,
     ignore_value: bool,
@@ -12,13 +12,11 @@ pub struct PutRequest {
 }
 
 impl PutRequest {
-    pub fn new<N>(key: N, value: N) -> Self
-    where
-        N: Into<String>,
+    pub fn new(key: &[u8], value: &[u8]) -> Self
     {
         Self {
-            key: key.into(),
-            value: value.into(),
+            key: key.to_vec(),
+            value: value.to_vec(),
             lease: None,
             prev_kv: false,
             ignore_lease: false,
@@ -51,8 +49,8 @@ impl Into<rpc::PutRequest> for PutRequest {
     fn into(self) -> rpc::PutRequest {
         let mut req = rpc::PutRequest::new();
 
-        req.set_key(self.key.into_bytes());
-        req.set_value(self.value.into_bytes());
+        req.set_key(self.key.to_vec());
+        req.set_value(self.value.to_vec());
         req.set_ignore_lease(self.ignore_lease);
         req.set_ignore_value(self.ignore_value);
         req.set_prev_kv(self.prev_kv);

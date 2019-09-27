@@ -54,7 +54,7 @@ fn main() {
                     .map_err(|_| ())
                     .for_each(move |_| {
                         let print_kv = kv_client
-                            .get(GetRequest::key("foo"))
+                            .get(GetRequest::key(b"foo"))
                             .map(|resp| {
                                 println!("key values: {:?}", resp);
                             })
@@ -70,7 +70,7 @@ fn main() {
             // put key value
             let put_kv = client
                 .kv()
-                .put(PutRequest::new("foo", "bar").with_lease(lease_id))
+                .put(PutRequest::new(b"foo", b"bar").with_lease(lease_id))
                 .map(|_| ())
                 .map_err(|e| {
                     println!("failed to put key value: {:?}", e);

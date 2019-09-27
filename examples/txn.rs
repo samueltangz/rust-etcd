@@ -14,8 +14,8 @@ fn main() {
         .txn(
             TxnRequest::new()
                 .when_value("foo", TxnCmp::Equal, "bar")
-                .and_then(PutRequest::new("result", "good"))
-                .or_else(PutRequest::new("result", "bad")),
+                .and_then(PutRequest::new(b"result", b"good"))
+                .or_else(PutRequest::new(b"result", b"bad")),
         )
         .map_err(|e| println!("exec transaction encouter error: {:?}", e))
         .and_then(move |resp| {
@@ -31,10 +31,15 @@ fn main() {
 
             client
                 .kv()
-                .get(GetRequest::key("result"))
+                .get(GetRequest::key(b"result"))
                 .map(|resp| {
                     let kv = &resp.kvs()[0];
-                    println!("key: {}, value: {}", kv.key(), kv.value()); // result: good or result: bad
+                    println!(
+                        "key: {}, value: {}", 
+                        String::from_utf8(kv.key().to_vec()).unwrap(),
+                        String::from_utf8(kv.value().to_vec()).unwrap(),
+                    ); // result: good or result: bad
+                    
                 })
                 .map_err(|e| println!("failed to fetch key-value 'result': {:?}", e))
         });
